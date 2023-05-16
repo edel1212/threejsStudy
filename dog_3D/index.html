@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <canvas id="canvas" width="500px" height="500px">
+
+    </canvas>
+
+    <script  type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.141.0/build/three.module.js",
+                "GLTFLoader" : "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import {GLTFLoader} from 'GLTFLoader';
+
+        /**
+         * 3D model을 보여주기 위해서는
+         * 0 씬 장면
+         * 1 카메라
+         * 2 조명
+         * 3 배경
+         * 3가지가 필요하다.
+         * 
+        */
+
+        // 장면(신) 생성
+        const scene = new THREE.Scene();
+        
+        // 배경색 지정
+        scene.background = new THREE.Color("white");
+
+        // 브라우저에 렌더링 요청 
+        // 내부 생성될 canvas 지정      
+        const renderer = new THREE.WebGLRenderer({
+            // canvas 대상 지정
+            canvas : document.querySelector("#canvas"),
+            // 계단 현상 방지
+            antialias : true
+        });
+
+        // 색상을 웹용 색상 방식으로 변경
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        // GLTF 파일을 웹으로 가져오는 방법
+        // 가져 오기 위해서는 GLTFLoader가 필요함 
+        let loader = new GLTFLoader();
+        
+        // 카메라 생성
+        // 2가지 종류가 있다
+        //  - PerspectiveCamera   :: 원근법 적용 
+        //  - OrthographicCamera  :: 원근법 미적용
+        const camera = new THREE.PerspectiveCamera(30,1);
+        // 카메라 포지션 지정 x,y,z
+        camera.position.set(0,0,10);
+        
+
+        // GLTFLoader에 불러올 이미지 선택
+        // 내부 함수로 불러온 후 callback 함수 실행
+        loader.load('/dog_3D/asset/shiba/scene.gltf',(gltf)=>{
+            // 받아온 gltf를 장면으로 변환 하여 씬에 추가
+            scene.add(gltf.scene);
+
+            // 반복될 함수 선언 - requestAnimationFrame()를 통해 반복
+            let animate = ()=>{
+                // 애니메이션 함수 Call
+                requestAnimationFrame(animate);
+                gltf.scene.rotation.y += 0.02;
+                // 렌더링 시작
+                renderer.render(scene, camera);
+            }
+
+            // 애니메이션 함수 call
+            animate();
+            
+        });
+
+    </script>
+</body>
+</html>
