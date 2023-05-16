@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        
+        /*** 장면 객체 생성 **/
+        const scene = new THREE.Scene();
+                
+        scene.background = new THREE.Color("blue"); // 설정이 없으면 디폴트 Black
+
+        /*** 카메라 생성 **/
+        /**
+         * 파마리터 설명
+         * - 첫번째field of view(시야각) : 해당 시점의 화면이 보여지는 정도를 나태냄 값은 "각도로 나타낸다".
+         * - 두번째 aspect ratio(종횡비) : 높이와 니비에 맞춰 표기허기 위함
+         * - 세번째 near : 해당값보다 가까이 있으면 렌더링 하지 않음
+         * - 네번째 far  : 해당값보다 멀리있으면 렌더링 하지 않음
+        */
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1 , 1_000);
+
+        // 카메라 포지션 지정
+        camera.position.z = 3;
+
+        /*** 랜더링을 해줄 객체 생성 **/
+        const renderer = new THREE.WebGLRenderer();
+        
+        //랜더링할 너비, 높이 설정 [ 번외로 성능 항샹을 위해 해상도를 낮추려면 3번째 파라미터에 false를 추가 ]
+        //renderer.setSize(window.innerWiddth, window.innerHeight, false); // < 해상도를 낮추는 옵션 추가
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    
+        // 해당 명령어를 통해 body에 랜더링 설정으로 만들어진 canvas가 추가됨
+        document.body.appendChild( renderer.domElement );
+
+
+        /*** canvas에 추가될 3D 도형 추가 **/
+
+        // 좌표 설정
+        const geometry = new THREE.BoxGeometry( 1, 1, 1 );
+        // 재료 설정
+        const material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+        // 설정을 사용한 도형 생성
+        const cube = new THREE.Mesh( geometry, material );
+
+        /*** 생성된 도형을 장면에 추가 **/
+        scene.add( cube );
+
+        
+        /*** 애니메이션 추가 **/
+        function animate() {
+            // 반복 Function
+            requestAnimationFrame( animate );
+
+            cube.rotation.x += 0.01;
+            cube.rotation.y += 0.01;
+
+            renderer.render( scene, camera );
+        }
+
+        // call
+        animate();
+
+    </script>   
+
+
+</body>
+</html>
