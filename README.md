@@ -4,6 +4,6 @@
 
 - 💬 **[ [이동](https://github.com/edel1212/threejsStudy/blob/main/creatingScene/index.html) ]** ::장면 만들기
 - 💬 **[ [이동](https://github.com/edel1212/threejsStudy/blob/main/drawingLine/index.html) ]** ::라인 만들기
-
+- 💬 **[ [이동](https://github.com/edel1212/threejsStudy/blob/main/creatingScene/index.html) ]** ::3D 모델 로드
 <br/>
 <hr/>
