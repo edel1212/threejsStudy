@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <canvas id="c"></canvas>
+
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        
+        // Renderer 객체 생성
+        const renderer = new THREE.WebGLRenderer({
+            antialias : true,                       // 계단현상 제거  
+            canvas : document.querySelector("#c")   // 대상 캔버스 지정        
+        });
+
+        // 카메라 객체 생성
+        const fov       =  75   ; // 원근 카메라 각도
+        const aspect    = 2     ; // 캔버스의 디스플레이 측면
+        const near      = 0.1   ; // 가까운 거리 - 보다 작을경우 그리지 않음
+        const far       = 5     ; // 먼거리     - 보다 클경우 그리지 않음
+        const camera = new THREE.PerspectiveCamera(fov,aspect, near, far);
+        camera.position.z = 2;
+
+        // 장면 객체 생성
+        const scene = new THREE.Scene();
+
+        // 모양 정의 - Three.js에서 표시하려는 거의 모든 것은 3D개체를 구성하는 정점을 정의해 줘야함 [👉물체의 모양]
+        const boxWidth = 1;
+        const boxHeight = 1;
+        const boxDepth = 1;
+        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+ 
+        // 3D 큐브의 재질 설정 [👉물체를 그리는 방법, 광택 또는 평면, 색상, 적용할 텍스처 등]
+        //const material = new THREE.MeshBasicMaterial({color: 0x44aa88}); //❌ 해당 재질은 빛이 반사되지 않음 
+        const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
+
+        // 큐브 생성
+        const cube = new THREE.Mesh(geometry, material);
+
+        scene.add(cube);
+
+        // 💬 현재 바로 랜더링을 진행하면  고정된 큐브만 보임 
+        renderer.render(scene, camera);
+
+        // 애니메이션 효과 추가
+        function animationFunc(time){
+            time *= 0.001;
+
+            cube.rotation.x = time;
+            cube.rotation.y = time;
+            renderer.render(scene, camera);
+
+            requestAnimationFrame(animationFunc);
+        }
+        animationFunc(20);
+
+        /**
+         * 조명을 나중에 추가했는데도 적용이 되는 이유?
+         * 
+         * Three.js는 렌더링 프로세스를 순차적으로 실행합니다. 먼저 장면(scene)에 있는 모든 객체를 그리고, 
+         * 그 후에 조명(light)을 적용하여 조명 효과를 계산합니다. 따라서 조명을 나중에 추가해도 해당 조명은 다음 프레임부터 적용되며,
+         *  이전 프레임에서는 조명이 적용되지 않습니다.
+         * 
+        */
+        // 조명 추가 
+        const color = 0xFFFFFF;     // 조명 색상
+        const intensity = 1;        // 밝기 강도
+        const light = new THREE.DirectionalLight(color, intensity);
+        light.position.set(-1,2,4); // 조명 위치 설정
+        scene.add(light);           // 장면에 조명 추가
+
+
+    </script>
+
+</body>
+</html>
