@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+
+        // Scene 객체 생성
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color("yellow");
+
+        // Render 객체 생성
+        const render = new THREE.WebGLRenderer();
+        render.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(render.domElement);
+
+        // Camera 객체 생성
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1 , 500)
+        // ✅ 카메라의 위치를 설정하는것
+        camera.position.set(0,0,100);
+        // ✅ 위에서  설정한 카메라의 위치에서 바라보는 설정을 지정하는것이다
+        camera.lookAt(0,0,0);
+
+        // Material 객체 생성
+        const material = new THREE.LineBasicMaterial({color : "red"})
+
+        // 기준이 될 Point 배열 생성
+        // ✅ 배열에는 한개의 값만 있을경우 도형이 그려지지 않음
+        // 각각을 포지션좌표로 보면 된다 선은 점과 점이 이어지는것이니깐!
+        const points = [];
+        points.push( new THREE.Vector3( - 10, 0, 0 ) );
+        points.push( new THREE.Vector3( 0, 10, 0 ) );
+        points.push( new THREE.Vector3( 10, 0, 0 ) );
+
+        // 공간 추가 [ 상위 배열을 사용 ]
+        const geometry = new THREE.BufferGeometry().setFromPoints( points );
+
+        // 보여질 Line 객세 생청
+        const line = new THREE.Line(geometry, material);
+
+        // 장면에 추가
+        scene.add(line);
+
+        render.render(scene, camera);
+
+    </script>
+
+
+</body>
+</html>
