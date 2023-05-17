@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+
+    <script  type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.141.0/build/three.module.js",
+                "GLTFLoader" : "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        /**
+         * Three.js 공식 레퍼런스상 
+         * 3D Model의 경우 황장자가 glTF를 권장하고있다.
+        */
+
+        import { GLTFLoader } from 'GLTFLoader';
+        import * as THREE from 'three';
+
+        // scene 생성
+        const scene = new THREE.Scene();
+
+        // render 생성
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.querySelector("body").appendChild(renderer.domElement);
+        // 웹용 색상으로 변경
+        renderer.outputEncoding = THREE.sRGBEncoding;
+
+        // 카메라 생성
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1 , 500)
+        camera.position.set(0,0,5);
+        camera.lookAt(0,0,0);
+
+        // gltf로더 생성
+        const loader = new GLTFLoader();
+        loader.load("/dog_3D/asset/shiba/scene.gltf",(gltf)=>{
+            //console.log(gltf);
+            /**
+             * 💬 중요 포인트는 gltf는 JSON 형태이다
+             *    - 그렇기에 안의 3D객체를 끄내줘야함!! 에러났었음..
+             * ❌ Error Messge : THREE.Object3D.add: object not an instance of THREE.Object3D
+             *  👉 원인 :: scene.add(gltf);
+             * **/
+            scene.add(gltf.scene);
+            renderer.render(scene, camera);
+        });
+
+    </script>
+</body>
+</html>
