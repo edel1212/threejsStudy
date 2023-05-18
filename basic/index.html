@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <canvas id="c"></canvas>
+
+    <script type="module">
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        
+        // Renderer 객체 생성
+        const renderer = new THREE.WebGLRenderer({
+            antialias : true,                       // 계단현상 제거  
+            canvas : document.querySelector("#c")   // 대상 캔버스 지정        
+        });
+
+        // 카메라 객체 생성
+        const fov       =  75   ; // 원근 카메라 각도
+        const aspect    = 2     ; // 캔버스의 디스플레이 측면
+        const near      = 0.1   ; // 가까운 거리 - 보다 작을경우 그리지 않음
+        const far       = 5     ; // 먼거리     - 보다 클경우 그리지 않음
+        const camera = new THREE.PerspectiveCamera(fov,aspect, near, far);
+        camera.position.z = 2;
+
+        // 장면 객체 생성
+        const scene = new THREE.Scene();
+
+        // 모양 정의 - Three.js에서 표시하려는 거의 모든 것은 3D개체를 구성하는 정점을 정의해 줘야함 [👉물체의 모양]
+        const boxWidth = 1;
+        const boxHeight = 1;
+        const boxDepth = 1;
+        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
+ 
+        // 3D 큐브의 재질 설정 [👉물체를 그리는 방법, 광택 또는 평면, 색상, 적용할 텍스처 등]
+        //const material = new THREE.MeshBasicMaterial({color: 0x44aa88}); //❌ 해당 재질은 빛이 반사되지 않음 
+        const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
+
+        // 조명 추가
+        const color = 0xFFFFFF;        // 조명 색상
+        const intensity = 1;         // 밝기 강도
+        const light = new THREE.DirectionalLight(color, intensity);
+        light.position.set(-1,2,4);    // 조명 위치 설정
+        scene.add(light);             // 장면에 조명 추가
+
+        // 큐뷰 생성 인스턴스
+        function  makeInstance(geomerty, color , x){
+            const meterial = new THREE.MeshPhongMaterial({color});
+            const cube = new THREE.Mesh(geomerty, meterial);
+            scene.add(cube);
+
+            cube.position.x = x;
+            return cube;
+        }
+
+        // 큐브 배열 생성
+        const cubes = [ makeInstance(geometry, 0x44aa88,  0)
+                        , makeInstance(geometry, 0x8844aa, -2)
+                        , makeInstance(geometry, 0xaa8844,  2) ];
+
+        // 애니메이션 효과 추가
+        function animationFunc(time){
+            time *= 0.001;
+
+            cubes.forEach((cube, ndx) => {
+                const speed = 1 + ndx * .1;
+                const rot = time * speed;
+                cube.rotation.x = rot;
+                cube.rotation.y = rot;
+            });
+            renderer.render(scene, camera);
+
+            requestAnimationFrame(animationFunc);
+        }
+        animationFunc(20);
+
+    </script>
+
+</body>
+</html>

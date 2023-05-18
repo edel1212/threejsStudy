@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body {
+           margin: 0;
+           height: 100%;
+        }
+        #c {
+           width: 100%;
+           height: 100%;
+           /* block을 사용하지 않으면 여백이 생김 */
+           display: block;
+        }
+        </style>
+</head>
+<body>
+    <canvas id="c"></canvas>
+
+    <script type="module">
+        "use strict";
+        import * as THREE from 'https://unpkg.com/three/build/three.module.js';
+        
+        // scene
+        const scene = new THREE.Scene();
+        
+        // camera
+        const camera = new THREE.PerspectiveCamera(75,2, 0.1, 10);
+        camera.position.z = 2;
+
+        // renderer
+        const renderer = new THREE.WebGLRenderer({canvas : document.querySelector("#c"),antialias : true});
+
+        // 모양 정의 - Three.js에서 표시하려는 거의 모든 것은 3D개체를 구성하는 정점을 정의해 줘야함 [👉물체의 모양]
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+ 
+        // 큐브 배열 생성
+        const cubes = [ makeInstance(geometry, 0x44aa88,  0), makeInstance(geometry, 0x8844aa, -2), makeInstance(geometry, 0xaa8844,  2) ];
+
+        // 조명 추가
+        const light = new THREE.DirectionalLight(0xFFFFFF, 1);
+        light.position.set(-1,2,4);   // 조명 위치 설정
+        scene.add(light);             // 장면에 조명 추가
+
+        // 애니메이션 효과 추가
+        function animationFunc(time){
+            time *= 0.001;
+
+            cubes.forEach((cube, ndx) => {
+                const speed = 1 + ndx * .1;
+                const rot = time * speed;
+                cube.rotation.x = rot;
+                cube.rotation.y = rot;
+            });
+            
+            /**
+             * 화면을 줄여도 해당 화면에 모든것이 나오는것이 아닌
+             * 현재 비율에 맞춰서 보이게끔함
+             * ex) 
+             *     💬 적용 전
+             *     ㅁ ㅁ ㅁ  << 전체화면 다보임
+             *     ㅁ ㅁ ㅁ  << 화면을 죽여도 찌그러져서 다보임
+             * 
+             *     💬 적용 후
+             *     ㅁ ㅁ ㅁ  << 전체화면 다보임
+             *        ㅁ    << 가운데만 보임 중간으로 잡힘
+            */
+            // 👉 랜러딩중인 캔버스를 찾음
+            if(resizeRendererToDisplaySize(renderer)){
+                const canvas = renderer.domElement;
+                // 전제조건은 canvas의 css가 '%'여야 함 그래야 읽지!
+                camera.aspect = canvas.clientWidth/ canvas.clientHeight;
+                // 적용된 카메라 옵션을 업데이트!
+                camera.updateProjectionMatrix();
+            }
+            
+
+            renderer.render(scene, camera);
+
+            requestAnimationFrame(animationFunc);
+        }
+        animationFunc(20);
+        
+        /**
+         * 큐뷰 생성 인스턴스
+         * @param BoxGeometry   geomerty 
+         *        String        color
+         *        int           x 
+         * @return Mesh
+        */
+         function  makeInstance(geomerty, color , x){
+            const meterial = new THREE.MeshPhongMaterial({color});
+            const cube = new THREE.Mesh(geomerty, meterial);
+            scene.add(cube);
+            cube.position.x = x;
+            return cube;
+        }
+
+        /**
+         * 화면의 크기에 맞춰서 도형을 랜더링 할수있게함
+         * - 👉 css로 예를 들면 120x120 이미지를 width:500으로 조정하면 
+         *      이상없이 그려지나 픽셀이 깨지는거와 비슷한 개념
+         * @param WebGLRenderer renderer
+         * @return boolean
+        */
+        function resizeRendererToDisplaySize(renderer){
+            // canvas를 찾음
+            const canvas = renderer.domElement;
+            // 미세한 화질 조정을 위함
+            const pixelRatio = window.devicePixelRatio;
+            const width  = canvas.clientWidth  * pixelRatio || 0;
+            const height = canvas.clientHeight * pixelRatio || 0;
+            const needResize = canvas.width !== width  || canvas.height !== height;            
+            // 마지막 인자는 css도 같이 update할지 여부
+            if(needResize) renderer.setSize(width, height, false);
+            return needResize;
+        }
+
+    </script>
+
+</body>
+</html>
